@@ -1,6 +1,6 @@
 package storytests;
 
-import mockability.client.MockabilityClient;
+import mockability.client.HttpClientMockabilityClient;
 import mockability.client.adapters.HttpClientAdapter;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
@@ -23,13 +23,13 @@ import static org.junit.Assert.*;
 /**
  * Created by dnwiebe on 7/19/15.
  */
-public class HttpServletMockabilityTest {
+public class TransactionSeriesTest {
 
-    private MockabilityClient<HttpRequestBase, HttpResponse> subject;
+    private HttpClientMockabilityClient subject;
 
     @Before
     public void setup () {
-        subject = new MockabilityClient<> (new HttpClientAdapter(), "http://localhost:9000");
+        subject = new HttpClientMockabilityClient (new HttpClientAdapter(), "http://localhost:9000");
     }
 
     @Test
@@ -133,7 +133,7 @@ public class HttpServletMockabilityTest {
         for (Header header : msg.getAllHeaders ()) {
             List<String> values = map.get (header.getName ());
             if (values == null) {
-                values = new ArrayList<String> ();
+                values = new ArrayList<> ();
                 map.put (header.getName (), values);
             }
             values.add (header.getValue ());

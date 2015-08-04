@@ -1,6 +1,5 @@
 package mockability.client.adapters;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
@@ -16,7 +15,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;

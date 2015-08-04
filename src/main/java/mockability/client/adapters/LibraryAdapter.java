@@ -6,7 +6,7 @@ import java.util.List;
  * Created by dnwiebe on 7/19/15.
  */
 public interface LibraryAdapter<Q, S> {
-    public static class HeaderPair {
+    class HeaderPair {
         private String _name;
         private String _value;
         public HeaderPair (String name, String value) {
@@ -28,4 +28,10 @@ public interface LibraryAdapter<Q, S> {
     int getResponseStatus (S response);
     List<HeaderPair> getResponseHeaders (S response);
     byte[] getResponseBody (S response) throws Exception;
+
+    static void validateMethod (String method) {
+        if (!"|HEAD|GET|POST|PUT|DELETE|".contains ("|" + method + "|")) {
+            throw new IllegalArgumentException ("Unexpected request method " + method);
+        }
+    }
 }

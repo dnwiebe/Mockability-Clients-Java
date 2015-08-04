@@ -4,7 +4,7 @@ These clients are strictly unnecessary, because the Mockability server is easily
 However, these clients encapsulate the REST interface and allow you to make method calls instead of HTTP requests,
 and to represent HTTP requests and responses as Java objects instead of JSON strings.
 
-There are two clients now available, and another one to become available very soon.
+There are three clients now available, and it's fairly easy to write your own.
 
 ## Common Functionality
 All the Java clients have the functionality given below, although they use different data structures to represent
@@ -46,7 +46,7 @@ type `HttpServletMockabilityClient`.  The particular request and response object
 mocks provided by Spring (`MockHttpServletRequest` and `MockHttpServletResponse`), which are very easy to populate and
 examine.
 
-## Coming Soon - `SimpleMockabilityClient`
+## `SimpleMockabilityClient`
 Internally, the `MockabilityClient` uses simple, dumb data structures that do almost nothing for you but which are
 very easy to understand.  If you'd like to operate on a level lower than that of the popular HTTP libraries but higher
 than that of raw REST HTTP, you might look into using a `SimpleMockabilityClient` to interact with the Mockability

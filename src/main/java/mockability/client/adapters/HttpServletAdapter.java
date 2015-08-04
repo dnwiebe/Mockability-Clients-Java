@@ -17,9 +17,7 @@ public class HttpServletAdapter implements LibraryAdapter<MockHttpServletRequest
 
     @Override
     public MockHttpServletRequest convert (String method, String uri, List<HeaderPair> headers, byte[] body) throws Exception {
-        if (!"|HEAD|GET|POST|PUT|DELETE|".contains ("|" + method + "|")) {
-            throw new IllegalArgumentException ("Unexpected request method " + method);
-        }
+        LibraryAdapter.validateMethod(method);
         MockHttpServletRequest request = new MockHttpServletRequest ();
         request.setMethod (method);
         request.setRequestURI (uri);

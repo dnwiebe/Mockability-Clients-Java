@@ -1,7 +1,7 @@
 logs
 project/project
 project/target
-*/build/
+**/build/
 target
 tmp
 .history

@@ -1,7 +1,5 @@
 package mockability.client;
 
-import static mockability.utils.Utils.*;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +8,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import mockability.client.adapters.LibraryAdapter;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -18,8 +17,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -33,8 +30,7 @@ import java.util.List;
  */
 public class MockabilityClient<Q, S> {
 
-    private static final BASE64Encoder ENCODER = new BASE64Encoder ();
-    private static final BASE64Decoder DECODER = new BASE64Decoder ();
+    private static final Base64 CODEC = new Base64();
     HttpClient client = HttpClientBuilder.create ().build ();
     private LibraryAdapter<Q, S> adapter;
     private HttpHost host;
@@ -144,7 +140,7 @@ public class MockabilityClient<Q, S> {
     private String responseToJson (S response) throws Exception {
         int status = adapter.getResponseStatus(response);
         List<LibraryAdapter.HeaderPair> headers = adapter.getResponseHeaders (response);
-        String body = ENCODER.encode(adapter.getResponseBody(response));
+        String body = CODEC.encodeToString(adapter.getResponseBody(response));
 
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode root = mapper.createArrayNode ();
@@ -187,7 +183,7 @@ public class MockabilityClient<Q, S> {
         JsonNode bodyNode = root.get ("body");
         byte[] body;
         if (bodyNode != null) {
-            body = DECODER.decodeBuffer (root.get ("body").asText ());
+            body = CODEC.decode (root.get ("body").asText ());
         }
         else {
             body = new byte[] {};

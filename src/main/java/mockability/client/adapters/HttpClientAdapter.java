@@ -6,8 +6,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 
-import static mockability.utils.Utils.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URI;

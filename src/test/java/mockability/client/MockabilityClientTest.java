@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import mockability.client.adapters.LibraryAdapter;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -19,7 +20,6 @@ import org.apache.http.message.BasicHttpResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import sun.misc.BASE64Encoder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -38,7 +38,7 @@ public class MockabilityClientTest {
     private LibraryAdapter<String, String> adapter;
     private HttpClient client;
 
-    private static final BASE64Encoder ENCODER = new BASE64Encoder ();
+    private static final Base64 CODEC = new Base64 ();
 
     private static class TestAdapter implements LibraryAdapter<String, String> {
 
@@ -186,8 +186,7 @@ public class MockabilityClientTest {
         assertEquals ("gurble", headers.get (0).get ("name").asText());
         assertEquals ("flop", headers.get (0).get ("value").asText ());
         assertEquals (1, headers.size ());
-        BASE64Encoder encoder = new BASE64Encoder();
-        assertEquals (encoder.encode ("biggety-boo".getBytes ()), root.get ("body").asText ());
+        assertEquals (CODEC.encodeAsString ("biggety-boo".getBytes ()), root.get ("body").asText ());
 
         assertEquals ("200|millie=whump|prepared", response);
     }
@@ -254,7 +253,7 @@ public class MockabilityClientTest {
         root.set ("headers", translateHeaders(mapper, adapter.getRequestHeaders(request)));
         byte[] body = adapter.getRequestBody (request);
         if (body.length > 0) {
-            root.set ("body", new TextNode (ENCODER.encode (body)));
+            root.set ("body", new TextNode (CODEC.encodeAsString (body)));
         }
         return root;
     }

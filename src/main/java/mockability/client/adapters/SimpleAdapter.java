@@ -1,7 +1,5 @@
 package mockability.client.adapters;
 
-import com.sun.xml.internal.xsom.impl.parser.DelayedRef;
-
 import java.util.List;
 
 /**

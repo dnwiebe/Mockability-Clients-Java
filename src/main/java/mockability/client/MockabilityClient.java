@@ -26,7 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by dnwiebe on 7/19/15.
+ * Simplifies interaction with the Mockability server.
+ * @param <Q> Class that will represent an HTTP request for this client. Q for "reQuest."
+ * @param <S> Class that will represent an HTTP response for this client. S for "reSponse."
  */
 public class MockabilityClient<Q, S> {
 
@@ -35,6 +37,12 @@ public class MockabilityClient<Q, S> {
     private LibraryAdapter<Q, S> adapter;
     private HttpHost host;
 
+    /**
+     * Create a new MockabilityClient.
+     * @param adapter Instance of class that implements the LibraryAdapter interface, adapting MockabilityClient to
+     *                some standard representation of HTTP requests and responses.
+     * @param baseUrl Base URL of the Mockability server to connect to: for example, "http://localhost:9000".
+     */
     public MockabilityClient (LibraryAdapter<Q, S> adapter, String baseUrl) {
         try {
             this.adapter = adapter;
@@ -46,6 +54,13 @@ public class MockabilityClient<Q, S> {
         }
     }
 
+    /**
+     * Direct the Mockability server to forget everything it knows about requests and responses from your IP to
+     * the supplied URI with the supplied method.
+     * @param method HTTP method to clear: for example, "GET" or "POST".
+     * @param uri URI to clear: for example, "/library/book/12345?user=sam"
+     * @return If unsuccessful, a response with a body that explains the problem; otherwise, a 200 response.
+     */
     public S clear (String method, String uri) {
         try {
             HttpDelete request = new HttpDelete("/mockability/" + method + ensureInitialSlash (uri));
@@ -58,6 +73,17 @@ public class MockabilityClient<Q, S> {
         }
     }
 
+    /**
+     *  Direct the Mockability server to prepare for a request from your IP address to the supplied URI with the
+     *  supplied method, and to respond with the provided response when it arrives. If you call this method more
+     *  than once before you start sending the prepared-for requests, the Mockability server will remember your
+     *  preparations and send the responses you provide in the order in which you provided them.  These preparations
+     *  can be eliminated either by calling the clear() method or by restarting the server.
+     * @param method HTTP method to prepare for
+     * @param uri URI to prepare for
+     * @param response Response to send when the prepared-for request arrives
+     * @return If unsuccessful, a response with a body that explains the problem; otherwise, a 200 response.
+     */
     public S prepare (String method, String uri, S response) {
         try {
             HttpPost request = new HttpPost("/mockability/" + method + ensureInitialSlash (uri));
@@ -78,6 +104,14 @@ public class MockabilityClient<Q, S> {
         }
     }
 
+    /**
+     * Directs the Mockability server to send a list of all the requests it has received from your IP address to
+     * the supplied URI with the supplied method.  This list can be cleared either by calling the clear() method or
+     * by restarting the server.
+     * @param method HTTP method to report
+     * @param uri URI to report
+     * @return List of HTTP request objects corresponding to the requests seen by the server.
+     */
     public List<Q> report (String method, String uri) {
         try {
             HttpGet request = new HttpGet("/mockability/" + method + ensureInitialSlash (uri));

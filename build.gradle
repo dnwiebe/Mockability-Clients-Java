@@ -2,6 +2,7 @@ group 'com.dnwiebe'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 
@@ -18,4 +19,28 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Title": name,
+                "Implementation-Version": version)
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "http://nexus:8081/content/repositories/snapshots/"
+            credentials {
+                username 'admin'
+                password 'admin123'
+            }
+        }
+    }
 }

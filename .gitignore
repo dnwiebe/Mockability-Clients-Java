@@ -12,5 +12,6 @@ dist
 /.idea_modules
 /.classpath
 /.project
+/.gradle
 /RUNNING_PID
 /.settings

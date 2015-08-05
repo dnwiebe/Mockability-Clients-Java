@@ -8,7 +8,7 @@ import org.apache.http.client.methods.HttpRequestBase;
  * Created by dnwiebe on 7/23/15.
  */
 public class HttpClientMockabilityClient extends MockabilityClient<HttpRequestBase, HttpResponse> {
-    public HttpClientMockabilityClient (HttpClientAdapter adapter, String baseUrl) {
-        super (adapter, baseUrl);
+    public HttpClientMockabilityClient (String baseUrl) {
+        super (new HttpClientAdapter (), baseUrl);
     }
 }

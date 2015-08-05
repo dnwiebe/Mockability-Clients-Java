@@ -29,7 +29,7 @@ public class TransactionSeriesTest {
 
     @Before
     public void setup () {
-        subject = new HttpClientMockabilityClient (new HttpClientAdapter(), "http://localhost:9000");
+        subject = new HttpClientMockabilityClient ("http://localhost:9000");
     }
 
     @Test

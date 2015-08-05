@@ -138,11 +138,11 @@ public class MockabilityClientTest {
     @Test
     public void shouldSendDeleteRequestOnClear () throws Exception {
         HttpResponse clearResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "");
-        clearResponse.addHeader (new BasicHeader("millie", "whump"));
-        clearResponse.setEntity (new StringEntity ("cleared"));
+        clearResponse.addHeader(new BasicHeader("millie", "whump"));
+        clearResponse.setEntity(new StringEntity("cleared"));
         when(client.execute(any (HttpHost.class), any (HttpDelete.class))).thenReturn (clearResponse);
 
-        String response = subject.clear("GLOMPETY", "/wiggle");
+        String resultText = subject.clear("GLOMPETY", "/wiggle");
 
         ArgumentCaptor<HttpHost> hostCaptor = ArgumentCaptor.forClass(HttpHost.class);
         ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
@@ -155,17 +155,32 @@ public class MockabilityClientTest {
         HttpDelete request = (HttpDelete)requestCaptor.getValue ();
         assertEquals ("/mockability/GLOMPETY/wiggle", request.getRequestLine ().getUri ());
 
-        assertEquals ("200|millie=whump|cleared", response);
+        assertEquals ("cleared", resultText);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfClearFails () throws Exception {
+        HttpResponse clearResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 400, "");
+        clearResponse.setEntity(new StringEntity("Your mother wears army boots"));
+        when(client.execute(any (HttpHost.class), any (HttpDelete.class))).thenReturn (clearResponse);
+
+        try {
+            subject.clear("GLOMPETY", "/wiggle");
+            fail ();
+        }
+        catch (IllegalStateException e) {
+            assertEquals ("Your mother wears army boots", e.getMessage ());
+        }
     }
 
     @Test
     public void shouldSendPostRequestOnPrepare () throws Exception {
         HttpResponse postResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "");
-        postResponse.addHeader (new BasicHeader("millie", "whump"));
-        postResponse.setEntity (new StringEntity("prepared"));
+        postResponse.addHeader(new BasicHeader("millie", "whump"));
+        postResponse.setEntity(new StringEntity("prepared"));
         when(client.execute(any (HttpHost.class), any (HttpPost.class))).thenReturn (postResponse);
 
-        String response = subject.prepare("GLOMPETY", "/wiggle", "503|gurble=flop|biggety-boo");
+        String resultText = subject.prepare("GLOMPETY", "/wiggle", "503|gurble=flop|biggety-boo");
 
         ArgumentCaptor<HttpHost> hostCaptor = ArgumentCaptor.forClass(HttpHost.class);
         ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
@@ -188,7 +203,7 @@ public class MockabilityClientTest {
         assertEquals (1, headers.size ());
         assertEquals (CODEC.encodeAsString ("biggety-boo".getBytes ()), root.get ("body").asText ());
 
-        assertEquals ("200|millie=whump|prepared", response);
+        assertEquals ("prepared", resultText);
     }
 
     @Test

@@ -59,14 +59,20 @@ public class MockabilityClient<Q, S> {
      * the supplied URI with the supplied method.
      * @param method HTTP method to clear: for example, "GET" or "POST".
      * @param uri URI to clear: for example, "/library/book/12345?user=sam"
-     * @return If unsuccessful, a response with a body that explains the problem; otherwise, a 200 response.
+     * @return If unsuccessful, an IllegalStateException with a message that explains the problem;
+     *          otherwise, the text/plain body of the 200 response from the Mockability server.
      */
-    public S clear (String method, String uri) {
+    public String clear (String method, String uri) {
         try {
             HttpDelete request = new HttpDelete("/mockability/" + method + ensureInitialSlash (uri));
             HttpResponse response = client.execute(host, request);
-            return adapter.convert (response.getStatusLine().getStatusCode(),
-                    extractHeaders (response), extractBody (response));
+            if (response.getStatusLine ().getStatusCode() != 200) {
+                throw new IllegalStateException (new String (extractBody (response)));
+            }
+            return new String (extractBody (response));
+        }
+        catch (IllegalStateException e) {
+            throw e;
         }
         catch (Exception e) {
             throw new IllegalStateException (e);
@@ -82,19 +88,20 @@ public class MockabilityClient<Q, S> {
      * @param method HTTP method to prepare for
      * @param uri URI to prepare for
      * @param response Response to send when the prepared-for request arrives
-     * @return If unsuccessful, a response with a body that explains the problem; otherwise, a 200 response.
+     * @return If unsuccessful, an IllegalStateException with a message that explains the problem;
+     *          otherwise, the text/plain body of the 200 response from the Mockability server.
      */
-    public S prepare (String method, String uri, S response) {
+    public String prepare (String method, String uri, S response) {
         try {
             HttpPost request = new HttpPost("/mockability/" + method + ensureInitialSlash (uri));
             request.addHeader (new BasicHeader ("Content-Type", "application/json"));
             request.setEntity (new StringEntity(responseToJson (response)));
             HttpResponse prepareResponse = client.execute (host, request);
+            String resultText = new String (extractBody(prepareResponse));
             if (prepareResponse.getStatusLine ().getStatusCode () != 200) {
-                throw new IllegalStateException (new String (extractBody (prepareResponse)));
+                throw new IllegalStateException (resultText);
             }
-            return adapter.convert (prepareResponse.getStatusLine ().getStatusCode (),
-                    extractHeaders (prepareResponse), extractBody (prepareResponse));
+            return resultText;
         }
         catch (IllegalStateException e) {
             throw e;

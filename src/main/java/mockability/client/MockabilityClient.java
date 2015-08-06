@@ -63,20 +63,18 @@ public class MockabilityClient<Q, S> {
      *          otherwise, the text/plain body of the 200 response from the Mockability server.
      */
     public String clear (String method, String uri) {
-        try {
-            HttpDelete request = new HttpDelete("/mockability/" + method + ensureInitialSlash (uri));
-            HttpResponse response = client.execute(host, request);
-            if (response.getStatusLine ().getStatusCode() != 200) {
-                throw new IllegalStateException (new String (extractBody (response)));
-            }
-            return new String (extractBody (response));
-        }
-        catch (IllegalStateException e) {
-            throw e;
-        }
-        catch (Exception e) {
-            throw new IllegalStateException (e);
-        }
+        HttpDelete request = new HttpDelete("/mockability/" + method + ensureInitialSlash (uri));
+        return textOrThrow (request);
+    }
+
+    /**
+     * Direct the Mockability server to forget everything it knows about all requests and responses from your IP.
+     * @return If unsuccessful, an IllegalStateException with a message that explains the problem;
+     *          otherwise, the text/plain body of the 200 response from the Mockability server.
+     */
+    public String clear () {
+        HttpDelete request = new HttpDelete("/mockability");
+        return textOrThrow (request);
     }
 
     /**
@@ -96,12 +94,7 @@ public class MockabilityClient<Q, S> {
             HttpPost request = new HttpPost("/mockability/" + method + ensureInitialSlash (uri));
             request.addHeader (new BasicHeader ("Content-Type", "application/json"));
             request.setEntity (new StringEntity(responseToJson (response)));
-            HttpResponse prepareResponse = client.execute (host, request);
-            String resultText = new String (extractBody(prepareResponse));
-            if (prepareResponse.getStatusLine ().getStatusCode () != 200) {
-                throw new IllegalStateException (resultText);
-            }
-            return resultText;
+            return textOrThrow (request);
         }
         catch (IllegalStateException e) {
             throw e;
@@ -127,6 +120,22 @@ public class MockabilityClient<Q, S> {
                 throw new IllegalStateException (new String (extractBody (reportResponse)));
             }
             return inputStreamToRequests(reportResponse.getEntity().getContent());
+        }
+        catch (IllegalStateException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw new IllegalStateException (e);
+        }
+    }
+
+    private String textOrThrow (HttpRequest request) {
+        try {
+            HttpResponse response = client.execute(host, request);
+            if (response.getStatusLine ().getStatusCode() != 200) {
+                throw new IllegalStateException (new String (extractBody (response)));
+            }
+            return new String (extractBody (response));
         }
         catch (IllegalStateException e) {
             throw e;

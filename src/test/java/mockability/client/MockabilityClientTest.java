@@ -136,7 +136,7 @@ public class MockabilityClientTest {
     }
 
     @Test
-    public void shouldSendDeleteRequestOnClear () throws Exception {
+    public void shouldSendSpecificDeleteRequestOnSpecificClear () throws Exception {
         HttpResponse clearResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "");
         clearResponse.addHeader(new BasicHeader("millie", "whump"));
         clearResponse.setEntity(new StringEntity("cleared"));
@@ -154,6 +154,29 @@ public class MockabilityClientTest {
 
         HttpDelete request = (HttpDelete)requestCaptor.getValue ();
         assertEquals ("/mockability/GLOMPETY/wiggle", request.getRequestLine ().getUri ());
+
+        assertEquals ("cleared", resultText);
+    }
+
+    @Test
+    public void shouldSendNonspecificDeleteRequestOnNonspecificClear () throws Exception {
+        HttpResponse clearResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "");
+        clearResponse.addHeader(new BasicHeader("millie", "whump"));
+        clearResponse.setEntity(new StringEntity("cleared"));
+        when(client.execute(any (HttpHost.class), any (HttpDelete.class))).thenReturn (clearResponse);
+
+        String resultText = subject.clear();
+
+        ArgumentCaptor<HttpHost> hostCaptor = ArgumentCaptor.forClass(HttpHost.class);
+        ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+        verify (client).execute (hostCaptor.capture (), requestCaptor.capture ());
+
+        HttpHost host = hostCaptor.getValue ();
+        assertEquals ("baseUrl", host.getHostName ());
+        assertEquals (1234, host.getPort ());
+
+        HttpDelete request = (HttpDelete)requestCaptor.getValue ();
+        assertEquals ("/mockability", request.getRequestLine ().getUri ());
 
         assertEquals ("cleared", resultText);
     }
